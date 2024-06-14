@@ -16,16 +16,19 @@
 ################################################################################
 
 cd libiec61850
+git checkout v1.6_develop
+
 mkdir build && cd build
 cmake ../
-make
+make -j$(nproc)
 
-$CC $CFLAGS $LIB_FUZZING_ENGINE ../fuzz/fuzz_mms_decode.c -c \
-	-I../src/iec61850/inc -I../src/mms/inc -I../src/common/inc \
-	-I../hal/inc -I../src/logging
-
-
-$CXX $CXXFLAGS -fuse-ld=lld $LIB_FUZZING_ENGINE fuzz_mms_decode.o -o $OUT/fuzz_mms_decode ./src/libiec61850.a ./hal/libhal.a
+for file in $(find ../fuzz -regex ".*fuzz_mms_[^_]*\.c") ; do
+	fuzzer_name=$(basename $file .c)
+	$CC $CFLAGS $LIB_FUZZING_ENGINE $file -o $OUT/$fuzzer_name \
+		-I../src/iec61850/inc -I../src/mms/inc -I../src/common/inc \
+		-I../hal/inc -I../src/logging \
+		./src/libiec61850.a ./hal/libhal.a
+done
 
 # Copy over the options file
-cp $SRC/fuzz_decode.options $OUT/fuzz_decode.options
+cp $SRC/*.options $OUT/

@@ -2,5 +2,14 @@ homepage: "https://github.com/mz-automation/libiec61850"
 primary_contact: "support@mz-automation.de"
 auto_ccs:
   - "david@adalogics.com"
+  - "kiddo.pwn@gmail.com"
 language: c
+sanitizers:
+  - address
+  - memory
+  - undefined
+fuzzing_engines:
+  - afl
+  - honggfuzz
+  - libfuzzer
 main_repo: 'https://github.com/mz-automation/libiec61850'
